@@ -120,9 +120,28 @@
             transition: width 0.4s;
         }
         @media (max-width: 768px) {
-            h1 { font-size: 2em; }
-            .stats { grid-template-columns: 1fr 1fr; }
+            body { padding: 10px; }
+            h1 { font-size: 1.75em; }
+            .header { padding: 25px 15px; }
+            .stats { grid-template-columns: 1fr 1fr; gap: 10px; }
+            .stat-card { padding: 15px; }
+            .stat-num { font-size: 1.5em; }
+            .quiz-card { padding: 20px; }
+            .q-text { font-size: 1.1em; }
+            .choice { padding: 12px; }
             .actions, .nav { grid-template-columns: 1fr; }
+            .nav { position: static; gap: 12px; padding: 15px; }
+            button, select { font-size: 0.95em; padding: 14px; }
+        }
+        @media (max-width: 480px) {
+            h1 { font-size: 1.5em; }
+            .header p { font-size: 0.95em; }
+            .stats { grid-template-columns: 1fr; }
+            .stat-num { font-size: 1.75em; }
+            .q-num { font-size: 1em; }
+            .q-text { font-size: 1em; }
+            .choice { padding: 14px; font-size: 0.95em; }
+            .explanation-text { font-size: 0.95em; }
         }
     </style>
 </head>

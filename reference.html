@@ -114,6 +114,38 @@
             color: var(--bg);
             border-color: var(--accent);
         }
+
+        @media (max-width: 768px) {
+            body { padding: 10px; }
+            h1 { font-size: 1.75em; }
+            .header { padding: 25px 15px; }
+            .header p { font-size: 1em; }
+            .nav-grid, .ref-card { padding: 15px; }
+            .ref-card h2 { font-size: 1.25em; }
+            .question-text { padding: 15px; font-size: 1em; }
+            .answer-box { padding: 12px; }
+            .explanation { font-size: 0.95em; line-height: 1.6; }
+            .page-buttons { gap: 8px; }
+            .page-btn { padding: 10px 16px; font-size: 0.9em; }
+            .question-grid { grid-template-columns: repeat(auto-fill, minmax(50px, 1fr)); gap: 8px; }
+            .q-link { padding: 8px; font-size: 0.9em; }
+        }
+
+        @media (max-width: 480px) {
+            h1 { font-size: 1.5em; }
+            .header p { font-size: 0.9em; }
+            .nav-grid h3 { font-size: 1em; }
+            .ref-card { padding: 12px; }
+            .ref-card h2 { font-size: 1.1em; }
+            .question-text { font-size: 0.95em; padding: 12px; }
+            .answer-text { font-size: 1em; }
+            .explanation { font-size: 0.9em; }
+            .explanation h3 { font-size: 1.1em; }
+            .explanation h4 { font-size: 1em; }
+            .page-btn { padding: 8px 12px; font-size: 0.85em; }
+            .question-grid { grid-template-columns: repeat(5, 1fr); gap: 6px; }
+            .q-link { padding: 6px; font-size: 0.85em; }
+        }
     </style>
 </head>
 <body>
