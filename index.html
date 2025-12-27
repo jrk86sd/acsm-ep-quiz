@@ -175,7 +175,7 @@
         <div class="nav">
             <button onclick="prev()">← Previous</button>
             <div class="progress-wrap">
-                <div class="progress-label" id="prog-label">Question 1 of 50</div>
+                <div class="progress-label" id="prog-label">Question 1 of 200</div>
                 <div class="progress-bar"><div class="progress-fill" id="prog-bar"></div></div>
             </div>
             <button onclick="next()">Next →</button>
@@ -460,7 +460,7 @@ function displayQuestion() {
 
     document.getElementById('quiz').innerHTML = `
         <div class="quiz-card">
-            <div class="q-header"><span class="q-num">Question ${q.q} of 50</span></div>
+            <div class="q-header"><span class="q-num">Question ${q.q} of 200</span></div>
             <div class="q-text">${q.t}</div>
             <div class="choices">${choicesHTML}</div>
             ${resultHTML}
