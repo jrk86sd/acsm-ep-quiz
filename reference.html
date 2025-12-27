@@ -30127,8 +30127,34 @@
                 }
             }
         }
-        
+
         window.addEventListener('DOMContentLoaded', function() {
+            // Check if there's a hash in the URL (e.g., #q50)
+            var hash = window.location.hash;
+            if (hash && hash.startsWith('#q')) {
+                // Extract question number from hash
+                var qNum = parseInt(hash.substring(2));
+                if (qNum >= 1 && qNum <= 200) {
+                    // Calculate which page this question is on (10 questions per page)
+                    var pageNum = Math.ceil(qNum / questionsPerPage);
+                    // Show that page
+                    showPage(pageNum);
+                    // Wait a moment for the page to render, then scroll to the specific question
+                    setTimeout(function() {
+                        var targetCard = document.getElementById('q' + qNum);
+                        if (targetCard) {
+                            targetCard.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                            // Optional: briefly highlight the card
+                            targetCard.style.border = '3px solid #00d9ff';
+                            setTimeout(function() {
+                                targetCard.style.border = '';
+                            }, 2000);
+                        }
+                    }, 100);
+                    return;
+                }
+            }
+            // Default: show page 1
             showPage(1);
         });
     </script>
