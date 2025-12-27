@@ -688,7 +688,7 @@ function updateNavigator() {
         }
 
         // Check if answered
-        const answer = userAnswers[i];
+        const answer = userAnswers[questions[i].q];
         if (answer) {
             if (answer.correct) {
                 btn.classList.add('correct');
