@@ -119,6 +119,67 @@
             height: 100%; background: linear-gradient(90deg, var(--success), var(--accent));
             transition: width 0.4s;
         }
+        .question-navigator {
+            background: var(--card); border: 1px solid var(--border);
+            border-radius: 12px; padding: 20px; margin-bottom: 25px;
+        }
+        .nav-header {
+            color: var(--accent); margin-bottom: 15px; font-size: 1.1em;
+            font-weight: 600; display: flex; justify-content: space-between;
+            align-items: center;
+        }
+        .toggle-nav {
+            background: var(--bg); border: 2px solid var(--border);
+            padding: 8px 16px; border-radius: 8px; cursor: pointer;
+            font-size: 0.9em; color: var(--text); font-weight: 600;
+            transition: all 0.3s;
+        }
+        .toggle-nav:hover {
+            border-color: var(--accent); background: rgba(0,217,255,0.1);
+        }
+        .question-grid {
+            display: grid; grid-template-columns: repeat(auto-fill, minmax(45px, 1fr));
+            gap: 8px;
+        }
+        .q-nav-btn {
+            aspect-ratio: 1; background: var(--bg); border: 2px solid var(--border);
+            border-radius: 8px; cursor: pointer; font-size: 0.9em;
+            font-weight: 600; color: var(--text); transition: all 0.3s;
+            display: flex; align-items: center; justify-content: center;
+            position: relative;
+        }
+        .q-nav-btn:hover {
+            border-color: var(--accent); transform: scale(1.05);
+        }
+        .q-nav-btn.current {
+            border-color: var(--accent); border-width: 3px;
+            box-shadow: 0 0 10px rgba(0,217,255,0.3);
+        }
+        .q-nav-btn.answered {
+            background: rgba(0,217,255,0.15); border-color: var(--accent);
+        }
+        .q-nav-btn.correct {
+            background: rgba(16,185,129,0.2); border-color: var(--success);
+            color: var(--success);
+        }
+        .q-nav-btn.incorrect {
+            background: rgba(239,68,68,0.2); border-color: var(--error);
+            color: var(--error);
+        }
+        .legend {
+            display: flex; gap: 15px; margin-top: 15px; flex-wrap: wrap;
+            font-size: 0.85em; color: var(--text-dim);
+        }
+        .legend-item {
+            display: flex; align-items: center; gap: 6px;
+        }
+        .legend-box {
+            width: 20px; height: 20px; border-radius: 4px; border: 2px solid;
+        }
+        .legend-box.unanswered { background: var(--bg); border-color: var(--border); }
+        .legend-box.answered { background: rgba(0,217,255,0.15); border-color: var(--accent); }
+        .legend-box.correct { background: rgba(16,185,129,0.2); border-color: var(--success); }
+        .legend-box.incorrect { background: rgba(239,68,68,0.2); border-color: var(--error); }
         @media (max-width: 768px) {
             body { padding: 10px; }
             h1 { font-size: 1.75em; }
@@ -132,6 +193,10 @@
             .actions, .nav { grid-template-columns: 1fr; }
             .nav { position: static; gap: 12px; padding: 15px; }
             button, select { font-size: 0.95em; padding: 14px; }
+            .question-navigator { padding: 15px; }
+            .question-grid { grid-template-columns: repeat(auto-fill, minmax(40px, 1fr)); gap: 6px; }
+            .q-nav-btn { font-size: 0.85em; }
+            .legend { font-size: 0.8em; }
         }
         @media (max-width: 480px) {
             h1 { font-size: 1.5em; }
@@ -142,6 +207,12 @@
             .q-text { font-size: 1em; }
             .choice { padding: 14px; font-size: 0.95em; }
             .explanation-text { font-size: 0.95em; }
+            .question-navigator { padding: 12px; }
+            .nav-header { font-size: 1em; }
+            .question-grid { grid-template-columns: repeat(auto-fill, minmax(35px, 1fr)); gap: 5px; }
+            .q-nav-btn { font-size: 0.8em; }
+            .legend { font-size: 0.75em; gap: 10px; }
+            .legend-box { width: 16px; height: 16px; }
         }
     </style>
 </head>
@@ -169,7 +240,35 @@
             </select>
             <button onclick="resetQuiz()">🔄 Reset Quiz</button>
         </div>
-        
+
+        <div class="question-navigator">
+            <div class="nav-header">
+                <span>📍 Question Navigator</span>
+                <button class="toggle-nav" onclick="toggleNavigator()">Hide</button>
+            </div>
+            <div id="navigator-content">
+                <div class="question-grid" id="question-grid"></div>
+                <div class="legend">
+                    <div class="legend-item">
+                        <div class="legend-box unanswered"></div>
+                        <span>Unanswered</span>
+                    </div>
+                    <div class="legend-item">
+                        <div class="legend-box answered"></div>
+                        <span>Answered</span>
+                    </div>
+                    <div class="legend-item">
+                        <div class="legend-box correct"></div>
+                        <span>Correct</span>
+                    </div>
+                    <div class="legend-item">
+                        <div class="legend-box incorrect"></div>
+                        <span>Incorrect</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
         <div id="quiz"></div>
         
         <div class="nav">
@@ -430,6 +529,8 @@ function displayQuestion() {
     const userAnswer = userAnswers[q.q];
     const answered = userAnswer !== undefined;
 
+    updateNavigator();
+
     let choicesHTML = '';
     q.c.forEach((choice, index) => {
         const isSelected = answered ? userAnswer.selected === index : selectedChoice === index;
@@ -494,6 +595,7 @@ function submitAnswer() {
     saveProgress();
     updateStats();
     displayQuestion();
+    updateNavigator();
 }
 
 function toggleExplanation() {
@@ -551,13 +653,79 @@ function resetQuiz() {
         filteredQuestions = Array.from({length: questions.length}, (_, i) => i);
         document.getElementById('filter').value = 'all';
         updateStats();
+        updateNavigator();
         displayQuestion();
         alert('Quiz reset! All answers cleared.');
     }
 }
 
+function initNavigator() {
+    const grid = document.getElementById('question-grid');
+    grid.innerHTML = '';
+    for (let i = 0; i < questions.length; i++) {
+        const btn = document.createElement('div');
+        btn.className = 'q-nav-btn';
+        btn.textContent = i + 1;
+        btn.onclick = () => jumpToQuestion(i);
+        btn.id = `nav-btn-${i}`;
+        grid.appendChild(btn);
+    }
+    updateNavigator();
+}
+
+function updateNavigator() {
+    for (let i = 0; i < questions.length; i++) {
+        const btn = document.getElementById(`nav-btn-${i}`);
+        if (!btn) continue;
+
+        // Reset classes
+        btn.className = 'q-nav-btn';
+
+        // Check if current question
+        const currentQIndex = filteredQuestions[currentIndex];
+        if (i === currentQIndex) {
+            btn.classList.add('current');
+        }
+
+        // Check if answered
+        const answer = userAnswers[i];
+        if (answer) {
+            if (answer.correct) {
+                btn.classList.add('correct');
+            } else {
+                btn.classList.add('incorrect');
+            }
+        }
+    }
+}
+
+function jumpToQuestion(qNum) {
+    // Find the index in filteredQuestions
+    const newIndex = filteredQuestions.indexOf(qNum);
+    if (newIndex !== -1) {
+        currentIndex = newIndex;
+        displayQuestion();
+        updateNavigator();
+        // Scroll to quiz
+        document.getElementById('quiz').scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }
+}
+
+function toggleNavigator() {
+    const content = document.getElementById('navigator-content');
+    const btn = document.querySelector('.toggle-nav');
+    if (content.style.display === 'none') {
+        content.style.display = 'block';
+        btn.textContent = 'Hide';
+    } else {
+        content.style.display = 'none';
+        btn.textContent = 'Show';
+    }
+}
+
 loadProgress();
 updateStats();
+initNavigator();
 displayQuestion();
     </script>
 </body>
