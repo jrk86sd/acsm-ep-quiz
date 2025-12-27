@@ -157,44 +157,20 @@
         </div>
 
         <div class="nav-grid">
-            <h3>📑 Page Navigation (10 Questions Per Page):</h3>
-            <div class="page-buttons">
-                <button class="page-btn active" onclick="showPage(1)">Q1-10</button>
-                <button class="page-btn" onclick="showPage(2)">Q11-20</button>
-                <button class="page-btn" onclick="showPage(3)">Q21-30</button>
-                <button class="page-btn" onclick="showPage(4)">Q31-40</button>
-                <button class="page-btn" onclick="showPage(5)">Q41-50</button>
-                <button class="page-btn" onclick="showPage(6)">Q51-60</button>
-                <button class="page-btn" onclick="showPage(7)">Q61-70</button>
-                <button class="page-btn" onclick="showPage(8)">Q71-80</button>
-                <button class="page-btn" onclick="showPage(9)">Q81-90</button>
-                <button class="page-btn" onclick="showPage(10)">Q91-100</button>
-                <button class="page-btn" onclick="showPage(11)">Q101-110</button>
-                <button class="page-btn" onclick="showPage(12)">Q111-120</button>
-                <button class="page-btn" onclick="showPage(13)">Q121-130</button>
-                <button class="page-btn" onclick="showPage(14)">Q131-140</button>
-                <button class="page-btn" onclick="showPage(15)">Q141-150</button>
-                <button class="page-btn" onclick="showPage(16)">Q151-160</button>
-                <button class="page-btn" onclick="showPage(17)">Q161-170</button>
-                <button class="page-btn" onclick="showPage(18)">Q171-180</button>
-                <button class="page-btn" onclick="showPage(19)">Q181-190</button>
-                <button class="page-btn" onclick="showPage(20)">Q191-200</button>
-            </div>
-            
-            <div style="margin-top: 20px; padding-top: 20px; border-top: 1px solid var(--border);">
-                <h3 style="margin-bottom: 10px;">🔍 Jump to Specific Question:</h3>
-                <div class="question-grid" id="quickNav">
-                    <!-- Quick links will be populated by JavaScript -->
+            <h3>📑 Question Navigation:</h3>
+            <div style="display: flex; gap: 15px; align-items: center; margin-top: 15px; flex-wrap: wrap;">
+                <button class="page-btn" onclick="prevQuestion()" id="prevBtn">← Previous</button>
+                <div style="flex: 1; text-align: center; min-width: 250px;">
+                    <div style="color: var(--accent); font-weight: 600; margin-bottom: 8px;">Current: Question <span id="currentQ">1</span> of 200</div>
+                    <div style="display: flex; gap: 10px; justify-content: center; align-items: center; flex-wrap: wrap;">
+                        <label style="color: var(--text-dim);">Jump to:</label>
+                        <input type="number" id="jumpInput" min="1" max="200" placeholder="1-200"
+                            style="width: 80px; padding: 8px; background: var(--bg); border: 2px solid var(--border); border-radius: 8px; color: var(--text); text-align: center; font-weight: 600;"
+                            onkeypress="if(event.key==='Enter') jumpToQ()">
+                        <button class="page-btn" onclick="jumpToQ()" style="padding: 8px 16px;">Go</button>
+                    </div>
                 </div>
-            </div>
-        </div>
-
-            
-            <div style="margin-top: 20px; padding-top: 20px; border-top: 1px solid var(--border);">
-                <h3 style="margin-bottom: 10px;">🔍 Or Jump to Specific Question:</h3>
-                <div class="question-grid" id="quickNav">
-                    <!-- Quick links will be populated by JavaScript -->
-                </div>
+                <button class="page-btn" onclick="nextQuestion()" id="nextBtn">Next →</button>
             </div>
         </div>
 
@@ -30068,63 +30044,75 @@
 
 <script>
         var currentPage = 1;
-        var questionsPerPage = 10;
+        var questionsPerPage = 1;
         
         function showPage(pageNum) {
+            if (pageNum < 1 || pageNum > 200) return;
+
             currentPage = pageNum;
-            
-            var buttons = document.querySelectorAll('.page-btn');
-            for (var b = 0; b < buttons.length; b++) {
-                if (b + 1 === pageNum) {
-                    buttons[b].classList.add('active');
-                } else {
-                    buttons[b].classList.remove('active');
-                }
-            }
-            
-            var startQ = (pageNum - 1) * questionsPerPage + 1;
-            var endQ = pageNum * questionsPerPage;
-            
+
+            // Since questionsPerPage = 1, pageNum is the same as the question number
+            var questionNum = pageNum;
+
+            // Hide all cards
             var cards = document.querySelectorAll('.ref-card');
             for (var c = 0; c < cards.length; c++) {
                 cards[c].classList.remove('visible');
             }
-            
-            for (var i = startQ; i <= endQ; i++) {
-                var card = document.getElementById('q' + i);
-                if (card) {
-                    card.classList.add('visible');
-                }
+
+            // Show only the current question
+            var card = document.getElementById('q' + questionNum);
+            if (card) {
+                card.classList.add('visible');
             }
-            
-            updateQuickNav(startQ, endQ);
+
+            // Update the current question display
+            var currentQSpan = document.getElementById('currentQ');
+            if (currentQSpan) {
+                currentQSpan.textContent = questionNum;
+            }
+
+            // Update prev/next button states
+            updateNavButtons();
+
+            // Scroll to top
             window.scrollTo({ top: 0, behavior: 'smooth' });
         }
-        
-        function updateQuickNav(startQ, endQ) {
-            var quickNav = document.getElementById('quickNav');
-            if (!quickNav) return;
-            
-            quickNav.innerHTML = '';
-            
-            for (var i = startQ; i <= endQ; i++) {
-                var card = document.getElementById('q' + i);
-                if (card) {
-                    var link = document.createElement('a');
-                    link.href = '#q' + i;
-                    link.className = 'q-link';
-                    link.textContent = 'Q' + i;
-                    link.setAttribute('data-question', i);
-                    link.onclick = function(e) {
-                        e.preventDefault();
-                        var qNum = this.getAttribute('data-question');
-                        var targetCard = document.getElementById('q' + qNum);
-                        if (targetCard) {
-                            targetCard.scrollIntoView({ behavior: 'smooth' });
-                        }
-                    };
-                    quickNav.appendChild(link);
-                }
+
+        function updateNavButtons() {
+            var prevBtn = document.getElementById('prevBtn');
+            var nextBtn = document.getElementById('nextBtn');
+
+            if (prevBtn) {
+                prevBtn.disabled = currentPage <= 1;
+                prevBtn.style.opacity = currentPage <= 1 ? '0.5' : '1';
+            }
+            if (nextBtn) {
+                nextBtn.disabled = currentPage >= 200;
+                nextBtn.style.opacity = currentPage >= 200 ? '0.5' : '1';
+            }
+        }
+
+        function prevQuestion() {
+            if (currentPage > 1) {
+                showPage(currentPage - 1);
+            }
+        }
+
+        function nextQuestion() {
+            if (currentPage < 200) {
+                showPage(currentPage + 1);
+            }
+        }
+
+        function jumpToQ() {
+            var input = document.getElementById('jumpInput');
+            var qNum = parseInt(input.value);
+            if (qNum >= 1 && qNum <= 200) {
+                showPage(qNum);
+                input.value = '';
+            } else {
+                alert('Please enter a question number between 1 and 200');
             }
         }
 
@@ -30135,16 +30123,12 @@
                 // Extract question number from hash
                 var qNum = parseInt(hash.substring(2));
                 if (qNum >= 1 && qNum <= 200) {
-                    // Calculate which page this question is on (10 questions per page)
-                    var pageNum = Math.ceil(qNum / questionsPerPage);
-                    // Show that page
-                    showPage(pageNum);
-                    // Wait a moment for the page to render, then scroll to the specific question
+                    // Show that specific question (since questionsPerPage = 1, page number = question number)
+                    showPage(qNum);
+                    // Wait a moment for the page to render, then briefly highlight the card
                     setTimeout(function() {
                         var targetCard = document.getElementById('q' + qNum);
                         if (targetCard) {
-                            targetCard.scrollIntoView({ behavior: 'smooth', block: 'start' });
-                            // Optional: briefly highlight the card
                             targetCard.style.border = '3px solid #00d9ff';
                             setTimeout(function() {
                                 targetCard.style.border = '';
@@ -30154,7 +30138,7 @@
                     return;
                 }
             }
-            // Default: show page 1
+            // Default: show question 1
             showPage(1);
         });
     </script>
