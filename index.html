@@ -441,7 +441,7 @@ function displayQuestion() {
 
     document.getElementById('quiz').innerHTML = `
         <div class="quiz-card">
-            <div class="q-header"><span class="q-num">Question ${q.q} of 50</span></div>
+            <div class="q-header"><span class="q-num">Question ${q.q} of ${filteredQuestions.length}</span></div>
             <div class="q-text">${q.t}</div>
             <div class="choices">${choicesHTML}</div>
             ${resultHTML}
